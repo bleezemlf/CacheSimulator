@@ -3,7 +3,7 @@ using namespace std;
 
 DirectMap::DirectMap(int set_num, int data_size) :CacheSimBase(set_num, 1, data_size)
 {
-	_cache = new bitset<64>[_cache_line_num];
+	_cache = new bitset<1024>[_cache_line_num];
 	for (int i = 0; i < _cache_line_num; i++)
 		_cache[i][_valid_pos] = 0;
 }
@@ -15,52 +15,35 @@ DirectMap::~DirectMap()
 
 bool DirectMap:: Hit()
 {
-	int t1 = _index;
+	bool t = false;
 	if (_cache[_index][_valid_pos] == 0)
 		return false;
+	else
+		t = true;
 	for (int j = address_size - 1, k = _valid_pos - 1; j > address_size - 1 - _address_tag_size; j--, k--) {
-		if (_address[j] == _cache[t1][k])
+		if (_address[j] == _cache[_index][k])
 			continue;
 		else
 			return false;
 	}
-	return true;
+	return t;
 }
 
 void DirectMap::cache2CPU()
 {
-	cout << "hit" << endl;
+	//cout << "hit" << endl;
 }
 
 void DirectMap::memory2Cache()
 {
-	cout << "miss" << endl;
+	//cout << "miss" << endl;
 	if (_cache[_index][_valid_pos] == 0)
 		_cache[_index][_valid_pos] = 1;
 
-	for (int i = _valid_pos - 1, j = address_size - 1; i > _valid_pos - 1 - _address_tag_size; i--, j--)
+	for (int i = _valid_pos - 1, j = address_size - 1; 
+		i > _valid_pos - 1 - _address_tag_size; 
+		i--, j--)
 		_cache[_index][i] = _address[j];
-}
-
-void DirectMap::cacheSimulate(string file)
-{
-	/*
-	char raw_address[13];
-	ifstream ifs;
-	ifs.open(file, ios::in);
-	while (!ifs.eof()){
-		ifs.getline(raw_address, 13);
-		////raw_address -> bitset<20> address
-		bitset<20> address;
-		if (Hit(address))
-			cache2CPU();
-		else
-			memory2Cache(address);
-	}
-	ifs.close();
-	*/
-
-
 }
 
 void DirectMap::test()

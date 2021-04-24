@@ -48,13 +48,14 @@ bool SetAssociateFIFO::Hit()
 
 void SetAssociateFIFO::cache2CPU()
 {
-	cout << "hit" << endl;
+	//cout << "hit" << endl;
 }
 
 void SetAssociateFIFO::memory2Cache()
 {
-	cout << "miss" << endl;
+	//cout << "miss" << endl;
 	int replace_line = replaceLineSel();
+	_fifo_q[_index] = (_fifo_q[_index] + 1) % _set_line_num;
 	if (_cache[replace_line][_valid_pos] == 0)
 		_cache[replace_line][_valid_pos] = 1;
 
@@ -67,7 +68,6 @@ void SetAssociateFIFO::memory2Cache()
 int SetAssociateFIFO::replaceLineSel()
 {
 	int t1 = _index * _set_line_num + _fifo_q[_index];
-	_fifo_q[_index] = (_fifo_q[_index] + 1) % _set_line_num;
 	return t1;
 }
 

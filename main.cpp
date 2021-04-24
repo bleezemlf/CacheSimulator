@@ -2,6 +2,8 @@
 
 using namespace std;
 
+char file[20] = "traceijk.txt";
+
 /*
 CacheSimulator::CacheSimulator(int set_num, int set_line_num, int replace_policy = 0, int block_size = 4) :
 	_set_num(set_num),
@@ -119,7 +121,7 @@ void CacheSimulator::cacheSimulate(string file)
 
 int main()
 {
-	DirectMap t1(32);
+	/*DirectMap t1(32);
 	t1.test();
 	cout << endl;
 	SetAssociateRandom t2(2, 8);
@@ -127,4 +129,40 @@ int main()
 	cout << endl;
 	SetAssociateFIFO t3(1, 4);
 	t3.test();
+	cout << endl;
+	SetAssociateLRU t4(1, 4);
+	t4.test();*/
+
+	for (int size = 8; size <= 128; size *= 4) {
+		cout<< " size " << size << endl;
+		for (int line = 16; line <= 256; line *= 4) {
+			DirectMap t1(line);
+			cout << "DirectMap  " << " line " << line << endl;
+			t1.cacheSimulate();
+			for (int set = 2; set <= 8; set *= 2) {
+				SetAssociateLRU t3(line / set, set);
+				cout << "SetAssoLRU  " << " line  " << line << " set " << set << endl;
+				t3.cacheSimulate();
+			}
+			SetAssociateLRU t5(1, line);
+			cout << "fullSetAssoLRU  " << " line  " << line  << endl;
+			t5.cacheSimulate();
+			cout << "**********" << endl;
+		}
+		cout << "---------------------" << endl;
+	}
+	for (int size = 8; size <= 128; size *= 4) {
+		cout << " random and size " << size << endl;
+		for (int line = 16; line <= 256; line *= 4) {
+			for (int set = 2; set <= 8; set *= 2) {
+				SetAssociateRandom t2(line / set, set);
+				cout << "SetAssoRan  " << " line  " << line << " set " << set << endl;
+				t2.cacheSimulate();
+			}
+			SetAssociateRandom t4(1, line);
+			cout << "fullSetAssoRan  " << " line  " << line << endl;
+			t4.cacheSimulate();
+		}
+		cout << "---------------------" << endl;
+	}
 }

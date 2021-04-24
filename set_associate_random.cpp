@@ -41,12 +41,12 @@ bool SetAssociateRandom::Hit()
 
 void SetAssociateRandom::cache2CPU()
 {
-	cout << "hit" << endl;
+	//cout << "hit" << endl;
 }
 
 void SetAssociateRandom::memory2Cache()
 {
-	cout << "miss" << endl;
+	//cout << "miss" << endl;
 	int replace_line = replaceLineSel();
 	if (_cache[replace_line][_valid_pos] == 0)
 		_cache[replace_line][_valid_pos] = 1;
@@ -63,7 +63,6 @@ int SetAssociateRandom::replaceLineSel()
 	static uniform_int_distribution<int> dis1(0, _set_line_num - 1);
 	int t1 = 0;
 	t1 = dis1(random) + _index * _set_line_num;
-	cout << t1 << endl;
 	return t1;
 }
 
