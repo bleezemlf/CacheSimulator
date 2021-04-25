@@ -4,6 +4,7 @@ using namespace std;
 SetAssociateFIFO::SetAssociateFIFO(int set_num, int set_line_num, int data_size) :
 	CacheSimBase(set_num, set_line_num, data_size)
 {
+	_replace_line = 0;
 	_cache = new bitset<64>[_cache_line_num];
 	for (int i = 0; i < _cache_line_num; i++)
 		_cache[i][_valid_pos] = 0;
@@ -58,17 +59,34 @@ void SetAssociateFIFO::memory2Cache()
 	_fifo_q[_index] = (_fifo_q[_index] + 1) % _set_line_num;
 	if (_cache[replace_line][_valid_pos] == 0)
 		_cache[replace_line][_valid_pos] = 1;
-
+	if (write_policy == 1)
+		if (_cache[replace_line][_dirty_pos] == 1)
+			cache2Mem();
 	for (int i = _valid_pos - 1, j = address_size - 1;
 		i > _valid_pos - 1 - _address_tag_size;
 		i--, j--)
 		_cache[replace_line][i] = _address[j];
 }
 
+void SetAssociateFIFO::CPU2Cache()
+{
+	_cache[_replace_line][_dirty_pos] = 1;
+}
+
+void SetAssociateFIFO::cache2Mem()
+{
+	_cache[_replace_line][_dirty_pos] = 0;
+}
+
+void SetAssociateFIFO::CPU2Cache2Mem()
+{
+
+}
+
 int SetAssociateFIFO::replaceLineSel()
 {
-	int t1 = _index * _set_line_num + _fifo_q[_index];
-	return t1;
+	_replace_line = _index * _set_line_num + _fifo_q[_index];
+	return _replace_line;
 }
 
 void SetAssociateFIFO::test()

@@ -96,12 +96,16 @@ class SetAssociateFIFO :public CacheSimBase
 private:
 	bitset<64>* _cache;
 	int* _fifo_q;
+	int _replace_line;
 public:
 	SetAssociateFIFO(int set_num, int set_line_num, int data_size = 4);
 	~SetAssociateFIFO();
 	bool Hit();
 	void cache2CPU();
 	void memory2Cache();
+	void CPU2Cache();
+	void CPU2Cache2Mem();
+	void cache2Mem();
 	int replaceLineSel();
 	//void cacheSimulate();
 	void test();

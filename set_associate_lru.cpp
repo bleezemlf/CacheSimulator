@@ -4,6 +4,7 @@ using namespace std;
 SetAssociateLRU::SetAssociateLRU(int set_num, int set_line_num, int data_size) :
 	CacheSimBase(set_num, set_line_num, data_size)
 {
+	_replace_line = 0;
 	_cache = new bitset<64>[_cache_line_num];
 	for (int i = 0; i < _cache_line_num; i++)
 		_cache[i][_valid_pos] = 0;
@@ -68,7 +69,7 @@ void SetAssociateLRU::memory2Cache()
 		_cache[replace_line][_valid_pos] = 1;
 
 	if (write_policy == 1)
-		if (_cache[_index][_dirty_pos] == 1)
+		if (_cache[_replace_line][_dirty_pos] == 1)
 			cache2Mem();
 
 	for (int i = _valid_pos - 1, j = address_size - 1;
