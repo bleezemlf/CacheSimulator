@@ -47,14 +47,31 @@ void SetAssociateRandom::cache2CPU()
 void SetAssociateRandom::memory2Cache()
 {
 	//cout << "miss" << endl;
-	int replace_line = replaceLineSel();
-	if (_cache[replace_line][_valid_pos] == 0)
-		_cache[replace_line][_valid_pos] = 1;
-
+	_replace_line = replaceLineSel();
+	if (_cache[_replace_line][_valid_pos] == 0)
+		_cache[_replace_line][_valid_pos] = 1;
+	if (write_policy == 1)
+		if (_cache[_replace_line][_dirty_pos] == 1)
+			cache2Mem();
 	for (int i = _valid_pos - 1, j = address_size - 1; 
 			i > _valid_pos - 1 - _address_tag_size;
 			i--, j--)
-		_cache[replace_line][i] = _address[j];
+		_cache[_replace_line][i] = _address[j];
+}
+
+void SetAssociateRandom::CPU2Cache()
+{
+	_cache[_replace_line][_dirty_pos] = 1;
+}
+
+void SetAssociateRandom::cache2Mem()
+{
+	_cache[_replace_line][_dirty_pos] = 0;
+}
+
+void SetAssociateRandom::CPU2Cache2Mem()
+{
+
 }
 
 int SetAssociateRandom::replaceLineSel()

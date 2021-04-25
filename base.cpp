@@ -7,6 +7,8 @@ CacheSimBase::CacheSimBase(int set_num, int set_line_num, int data_size = 4) :
 	_set_line_num(set_line_num),
 	_data_size(data_size),
 	_hit_num(0),
+	_w_hit_num(0),
+	_w_cnt(0),
 	_cnt(0)
 
 {
@@ -21,7 +23,7 @@ CacheSimBase::CacheSimBase(int set_num, int set_line_num, int data_size = 4) :
 	_cache_size = _cache_line_num * _cache_line_size;
 
 	_valid_pos = _cache_line_size - 1;
-
+	_dirty_pos = _valid_pos + 1;
 }
 
 CacheSimBase::~CacheSimBase()
@@ -36,11 +38,9 @@ void CacheSimBase::cacheSimulate()
 	in_file.open("traceijk.txt", ios::in);
 
 	while (!in_file.eof()){
-		if (_cnt == 100000)
-			break;
+		//if (_cnt == 100000)
+		//	break;
 		in_file.getline(t1, 13);
-		if (t1[0] == '0')
-			continue;
 		unsigned int t2 = strtoul(t1 + 2, nullptr, 16);
 		bitset<20> t3(t2);
 		_address = t3;
@@ -50,17 +50,50 @@ void CacheSimBase::cacheSimulate()
 		_tag = 0;
 		for (int i = _address_offset_size + _address_index_size; i < address_size; i++)
 			_tag += _address[i] * pow(2, i - _address_offset_size - _address_index_size);
-		if (Hit()) {
-			_hit_num++;
-			_cnt++;
-			cache2CPU();
+		if (t1[0] == '0') {
+			if (write_policy == 0) {
+				if (Hit()) {
+					_w_hit_num++;
+					_w_cnt++;
+					CPU2Cache2Mem();
+				}
+				else {
+					_w_cnt++;
+					memory2Cache();
+					CPU2Cache2Mem();
+				}
+			}
+			else {
+				if (Hit()) {
+					_w_hit_num++;
+					_w_cnt++;
+					CPU2Cache();
+				}
+				else {
+					_w_cnt++;
+					memory2Cache();
+					CPU2Cache();
+				}
+			}
 		}
-		else{
-			_cnt++;
-			memory2Cache();
+		else {
+			if (Hit()) {
+				_hit_num++;
+				_cnt++;
+				cache2CPU();
+			}
+			else {
+				_cnt++;
+				memory2Cache();
+			}
 		}
 	}
 	in_file.close();
-	cout << "hit:" << _hit_num << " " << "total:" << _cnt << " "
-		<< "rate:" << float(_hit_num) / _cnt << endl << endl;
+	cout << "read hit:" << _hit_num << " " << "total:" << _cnt << " " << endl
+		<< "write hit:" << _w_hit_num << " " << "total:" << _w_cnt << " " << endl
+		<< " rate: " << float(_hit_num) / _cnt 
+		<< " write rate: " << float(_w_hit_num) / _w_cnt 
+		<< " average rate: " << float(_hit_num + _w_hit_num) / (_cnt+ _w_cnt)
+		<< endl << endl;
 }
+

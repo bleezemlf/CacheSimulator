@@ -24,7 +24,7 @@ bool SetAssociateLRU::Hit()
 	int t1 = _index * _set_line_num;
 	bool t2 = false;
 	for (int i = t1; i < t1 + _set_line_num; i++) {
-		_flag_line = i;
+		_replace_line = i;
 		if (_cache[i][_valid_pos] == 0) {
 			continue;
 		}
@@ -52,7 +52,7 @@ void SetAssociateLRU::cache2CPU()
 	int t1 = _index * _set_line_num;
 	for (int i = t1; i < t1 + _set_line_num; i++)
 		_LRU_q[i]++;
-	_LRU_q[_flag_line] = 0;
+	_LRU_q[_replace_line] = 0;
 }
 
 void SetAssociateLRU::memory2Cache()
@@ -62,10 +62,14 @@ void SetAssociateLRU::memory2Cache()
 	int t1 = _index * _set_line_num;
 	for (int i = t1; i < t1 + _set_line_num; i++)
 		_LRU_q[i]++;
-	_LRU_q[_flag_line] = 0;
+	_LRU_q[_replace_line] = 0;
 
 	if (_cache[replace_line][_valid_pos] == 0)
 		_cache[replace_line][_valid_pos] = 1;
+
+	if (write_policy == 1)
+		if (_cache[_index][_dirty_pos] == 1)
+			cache2Mem();
 
 	for (int i = _valid_pos - 1, j = address_size - 1;
 		i > _valid_pos - 1 - _address_tag_size;
@@ -75,19 +79,34 @@ void SetAssociateLRU::memory2Cache()
 	}
 }
 
+void SetAssociateLRU::CPU2Cache()
+{
+	_cache[_replace_line][_dirty_pos] = 1;
+}
+
+void SetAssociateLRU::cache2Mem()
+{
+	_cache[_replace_line][_dirty_pos] = 0;
+}
+
+void SetAssociateLRU::CPU2Cache2Mem()
+{
+
+}
+
 int SetAssociateLRU::replaceLineSel()
 {
 	int t1 = _index * _set_line_num;
-	_flag_line = t1;
+	_replace_line = t1;
 	int max = _LRU_q[t1];
 	for (int i = t1; i < t1 + _set_line_num; i++) {
 		if (max < _LRU_q[i]) {
 			max = _LRU_q[i];
-			_flag_line = i;
+			_replace_line = i;
 		}
 	}
 	
-	return _flag_line;
+	return _replace_line;
 }
 
 void SetAssociateLRU::test()

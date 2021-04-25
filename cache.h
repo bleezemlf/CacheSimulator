@@ -8,6 +8,7 @@
 using namespace std;
 
 const int address_size = 20;
+const int write_policy = 1;
 
 class CacheSimBase
 {
@@ -20,6 +21,7 @@ protected:
 	int _cache_line_size;
 	int _cache_size;
 	int _valid_pos;
+	int _dirty_pos;
 
 	int _tag;
 	int _index;
@@ -30,7 +32,9 @@ protected:
 	int _address_tag_size;
 
 	int _hit_num;
+	int _w_hit_num;
 	int _cnt;
+	int _w_cnt;
 public:
 	CacheSimBase(int set_num, int set_line_num, int data_size);
 	~CacheSimBase();
@@ -40,6 +44,10 @@ public:
 	virtual void memory2Cache() = 0;
 	virtual int replaceLineSel() = 0;
 	void cacheSimulate();
+
+	virtual void CPU2Cache() = 0;
+	virtual void CPU2Cache2Mem() = 0;
+	virtual void cache2Mem() = 0;
 
 };
 
@@ -56,6 +64,9 @@ public:
 	void cache2CPU();
 	void memory2Cache();
 	int replaceLineSel() { return _index; }
+	void CPU2Cache();
+	void CPU2Cache2Mem();
+	void cache2Mem();
 	//void cacheSimulate();
 	void test();
 };
@@ -65,6 +76,7 @@ class SetAssociateRandom:public CacheSimBase
 {
 private:
 	bitset<64>* _cache;
+	int _replace_line;
 public:
 	SetAssociateRandom(int set_num, int set_line_num, int data_size = 4);
 	~SetAssociateRandom();
@@ -72,6 +84,9 @@ public:
 	void cache2CPU();
 	void memory2Cache();
 	int replaceLineSel();
+	void CPU2Cache();
+	void CPU2Cache2Mem();
+	void cache2Mem();
 	//void cacheSimulate();
 	void test();
 };
@@ -95,9 +110,9 @@ public:
 class SetAssociateLRU :public CacheSimBase
 {
 private:
-	int _flag_line;
 	bitset<64>* _cache;
 	int* _LRU_q;
+	int _replace_line;
 public:
 	SetAssociateLRU(int set_num, int set_line_num, int data_size = 4);
 	~SetAssociateLRU();
@@ -105,6 +120,9 @@ public:
 	void cache2CPU();
 	void memory2Cache();
 	int replaceLineSel();
+	void CPU2Cache();
+	void CPU2Cache2Mem();
+	void cache2Mem();
 	//void cacheSimulate();
 	void test();
 };

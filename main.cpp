@@ -133,6 +133,15 @@ int main()
 	SetAssociateLRU t4(1, 4);
 	t4.test();*/
 
+	//DirectMap t1(256);
+	//t1.cacheSimulate();
+	//cout << endl;
+	//SetAssociateRandom t2(2, 8);
+	//t2.cacheSimulate();
+	//cout << endl;
+	//SetAssociateLRU t4(8, 4);
+	//t4.cacheSimulate();
+
 	for (int size = 8; size <= 128; size *= 4) {
 		cout<< " size " << size << endl;
 		for (int line = 16; line <= 256; line *= 4) {

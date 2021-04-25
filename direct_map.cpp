@@ -40,10 +40,29 @@ void DirectMap::memory2Cache()
 	if (_cache[_index][_valid_pos] == 0)
 		_cache[_index][_valid_pos] = 1;
 
+	if (write_policy == 1)
+		if(_cache[_index][_dirty_pos]==1)
+			cache2Mem();
+
 	for (int i = _valid_pos - 1, j = address_size - 1; 
 		i > _valid_pos - 1 - _address_tag_size; 
 		i--, j--)
 		_cache[_index][i] = _address[j];
+}
+
+void DirectMap::CPU2Cache()
+{
+	_cache[_index][_dirty_pos] = 1;
+}
+
+void DirectMap::cache2Mem()
+{
+	_cache[_index][_dirty_pos] = 0;
+}
+
+void DirectMap::CPU2Cache2Mem()
+{
+
 }
 
 void DirectMap::test()
